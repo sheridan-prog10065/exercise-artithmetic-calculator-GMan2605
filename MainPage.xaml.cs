@@ -1,12 +1,20 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace MathOperators;
 
 public partial class MainPage : ContentPage
 {
+    /// <summary>
+    /// Remembers the expressions that were calculated by the user
+    /// </summary>
+    private ObservableCollection<string> _expList;
+
     public MainPage()
     {
         InitializeComponent();
+        _expList = new ObservableCollection<string>();
+        _lstExpHistory.ItemsSource = _expList;
     }
 
     private void OnCalculate(object sender, EventArgs e)
@@ -25,7 +33,12 @@ public partial class MainPage : ContentPage
         double result = PerformArithmeticOperation(operation, leftOperand, rightOperand);
 
         // Display the whole operation and answer text to the user
-        _txtMathExp.Text = $"{leftOperand} {operation} {rightOperand} = {result}";
+        string expression = $"{leftOperand} {operation} {rightOperand} = {result}";
+        
+        // Remember the expression in the page using the field variable list
+        _expList.Add(expression);
+
+        _txtMathExp.Text = expression;
     }
 
     private double PerformArithmeticOperation(char operation, double leftOperand, double rightOperand)
