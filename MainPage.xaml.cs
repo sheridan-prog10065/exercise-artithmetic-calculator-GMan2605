@@ -17,28 +17,48 @@ public partial class MainPage : ContentPage
         _lstExpHistory.ItemsSource = _expList;
     }
 
-    private void OnCalculate(object sender, EventArgs e)
+    private async void OnCalculate(object sender, EventArgs e)
     {
-        // Get the number inputs to operate on
-        double leftOperand = double.Parse(_txtLeftOp.Text);
-        double rightOperand = double.Parse(_txtRightOp.Text);
+        try
+        {
+            // Get the number inputs to operate on
+            double leftOperand = double.Parse(_txtLeftOp.Text);
+            double rightOperand = double.Parse(_txtRightOp.Text);
 
-        // Get the specified operation type as a char
-        // Cast to string is possible because SelectedItem is an object
-        // Extra parenthesis are needed to ensure the index operator is applied to the string object, not the object
-        char operation = ((string)_pckOperand.SelectedItem)[0];
+            // Get the specified operation type as a char
+            // Cast to string is possible because SelectedItem is an object
+            // Extra parenthesis are needed to ensure the index operator is applied to the string object, not the object
+            char operation = ((string)_pckOperand.SelectedItem)[0];
 
 
-        // Perform the operation to get the answer
-        double result = PerformArithmeticOperation(operation, leftOperand, rightOperand);
+            // Perform the operation to get the answer
+            double result = PerformArithmeticOperation(operation, leftOperand, rightOperand);
 
-        // Display the whole operation and answer text to the user
-        string expression = $"{leftOperand} {operation} {rightOperand} = {result}";
-        
-        // Remember the expression in the page using the field variable list
-        _expList.Add(expression);
+            // Display the whole operation and answer text to the user
+            string expression = $"{leftOperand} {operation} {rightOperand} = {result}";
 
-        _txtMathExp.Text = expression;
+            // Remember the expression in the page using the field variable list
+            _expList.Add(expression);
+
+            _txtMathExp.Text = expression;
+        }
+        catch (ArgumentNullException ex)
+        {
+            //The user did not provide any input
+            await DisplayAlert("Arithmetic Calculator Error", "Please provide the required input", "OK");
+            //await DisplayAlert("MORE", "More details about this error", "OK");
+
+        }
+        catch (FormatException ex)
+        {
+            //The user provided non-numeric input
+            await DisplayAlert("Arithmetic Calculator Error", "Please provide the correct input", "OK");
+        }
+        catch (DivideByZeroException ex)
+        {
+            //The user tried to divide by zero (this only occurs for integer division, but not real division)
+            await DisplayAlert("Arithmetic Calculator Error", "Please provide a non-zero denominator!", "OK");
+        }
     }
 
     private double PerformArithmeticOperation(char operation, double leftOperand, double rightOperand)
